@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Trakz</title>
+<h1>📊 Trakz – Your Ultimate Daily Tracker</h1>
+
+
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="main-header">
+    <h1>⏳ My Daily Life Tracker</h1>
+    <p>Track every moment from wake up to sleep — and conquer procrastination.</p>
+  </header>
+
+  <main>
+    <!-- Slide-In Task Logger -->
+    <section class="task-entry-panel">
+      <h2>📝 Log Your Work</h2>
+      <form id="taskForm">
+        <div class="form-row">
+          <label for="startTime">Start Time</label>
+          <input type="time" id="startTime" required />
+        </div>
+        <div class="form-row">
+          <label for="endTime">End Time</label>
+          <input type="time" id="endTime" required />
+        </div>
+        <div class="form-row">
+          <label for="taskText">What did you do?</label>
+          <textarea id="taskText" placeholder="e.g., Studied OS, Scrolled Instagram, Slept..." rows="2" required></textarea>
+        </div>
+        <button type="submit" class="btn-add">➕ Add Entry</button>
+      </form>
+    </section>
+
+    <!-- Task Log Display -->
+    <section class="task-log">
+      <h2>📋 Daily Activity Log</h2>
+      <ul id="taskLog" class="log-list"></ul>
+    </section>
+
+    <!-- Sleep Tracker -->
+    <section class="sleep-tracker">
+      <h2>😴 Sleep Tracker</h2>
+      <div class="form-row">
+        <label for="sleepTime">Sleep Time</label>
+        <input type="time" id="sleepTime" />
+      </div>
+      <div class="form-row">
+        <label for="wakeTime">Wake Time</label>
+        <input type="time" id="wakeTime" />
+      </div>
+      <button id="calcSleep" class="btn-sleep">🛌 Log Sleep</button>
+      <p class="result-text">You slept <span id="sleepHours">0</span> hours today.</p>
+    </section>
+
+    <!-- Summary Box -->
+    <section class="summary-section">
+        
+
+      <h2>📊 Daily Summary</h2>
+      <div class="summary-grid">
+        <div class="summary-box work">
+          <h3>Work Time</h3>
+          <p><span id="workHours">0</span> hrs</p>
+        </div>
+        <div class="summary-box sleep">
+          <h3>Sleep Time</h3>
+          <p><span id="sleepSummary">0</span> hrs</p>
+        </div>
+        <div class="summary-box waste">
+          <h3>Procrastinated</h3>
+          <p><span id="wasteHours">0</span> hrs</p>
+        </div>
+      </div>
+      <div id="quoteArea" class="quote-box">💬 Your quote will appear here!</div>
+
+      <button id="generateSummary" class="btn-summary">📈 Generate Summary</button>
+    </section>
+  </main>
+
+  <footer>
+    <p>💡 Designed to reflect your day — Make every hour count!</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -28,9 +28,6 @@ Trakz is a smart personal productivity dashboard designed to help you:
 ## 🛡️ Note
 This app stores your data **locally** (in your browser), so it's fully private.
 
-## 📄 License
-MIT
 
----
 
 Built with ❤️ by [Swapnil Shikha](https://github.com/swapnil-shikha)

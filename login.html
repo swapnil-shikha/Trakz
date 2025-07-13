@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login | Trakz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f3f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #3f51b5;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #3f51b5;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .toggle-btn {
+      background: none;
+      color: #3f51b5;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      display: block;
+      margin: 15px auto 0;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+    }
+
+    .success {
+      color: green;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2 id="formTitle">Login to Trakz</h2>
+
+  <div id="form">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button onclick="handleSubmit()">Login</button>
+    <button class="toggle-btn" onclick="toggleForm()">Don't have an account? Sign up</button>
+    <p id="message" class="error"></p>
+  </div>
+</div>
+
+<script>
+  let isLogin = true;
+
+  function toggleForm() {
+    const title = document.getElementById("formTitle");
+    const btn = document.querySelector("button");
+    const toggle = document.querySelector(".toggle-btn");
+    const msg = document.getElementById("message");
+
+    isLogin = !isLogin;
+
+    msg.textContent = "";
+
+    if (isLogin) {
+      title.innerText = "Login to Trakz";
+      btn.innerText = "Login";
+      toggle.innerText = "Don't have an account? Sign up";
+    } else {
+      title.innerText = "Sign up for Trakz";
+      btn.innerText = "Sign Up";
+      toggle.innerText = "Already have an account? Login";
+    }
+  }
+
+  function handleSubmit() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const msg = document.getElementById("message");
+
+    if (!username || !password) {
+      msg.textContent = "All fields are required.";
+      return;
+    }
+
+    let users = JSON.parse(localStorage.getItem("trakz_users")) || {};
+
+    if (isLogin) {
+      if (users[username] && users[username] === password) {
+        msg.className = "success";
+        msg.textContent = "Login successful! Redirecting...";
+        localStorage.setItem("trakz_current_user", username);
+        setTimeout(() => window.location.href = "tracker.html", 1000);
+      } else {
+        msg.className = "error";
+        msg.textContent = "Invalid credentials.";
+      }
+    } else {
+      if (users[username]) {
+        msg.className = "error";
+        msg.textContent = "Username already exists.";
+      } else {
+        users[username] = password;
+        localStorage.setItem("trakz_users", JSON.stringify(users));
+        msg.className = "success";
+        msg.textContent = "Signup successful! Please login.";
+        toggleForm();
+      }
+    }
+  }
+</script>
+
+</body>
+</html>

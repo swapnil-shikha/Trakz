@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | Trakz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+    }
+  
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #3f51b5;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+  
+    .container {
+      padding: 20px;
+    }
+  
+    .section {
+      background: white;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      transition: 0.3s;
+    }
+  
+    .section:hover {
+      box-shadow: 0 6px 14px rgba(0,0,0,0.08);
+    }
+  
+    h3 {
+      margin-top: 0;
+      color: #333;
+    }
+  
+    input, textarea, select {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      transition: 0.2s ease;
+    }
+  
+    input:focus {
+      outline: none;
+      border-color: #3f51b5;
+    }
+  
+    button {
+      background: #3f51b5;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      margin-top: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+  
+    button:hover {
+      background-color: #2c3ea0;
+    }
+  
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+  
+    li {
+      background: #f1f1f1;
+      margin: 6px 0;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+  
+</head>
+<body>
+
+<header>
+  <div>
+    <div id="greeting">Hello!</div>
+    <div id="clock" style="font-size: 0.9rem;"></div>
+  </div>
+  <button onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+
+  <div class="section">
+    <h3>🌟 Quote of the Day</h3>
+    <p id="quoteBox">Loading...</p>
+  </div>
+
+  <div class="section">
+    <h3>📝 Add Task with Time</h3>
+    <input type="text" id="taskName" placeholder="Task description">
+    <input type="time" id="startTime">
+    <input type="time" id="endTime">
+    <button onclick="addTask()">Add Task</button>
+    <ul id="taskList"></ul>
+  </div>
+
+  <div class="section">
+    <h3>✅ To-Do List</h3>
+    <input type="text" id="todoInput" placeholder="New to-do">
+    <button onclick="addTodo()">Add To-Do</button>
+    <ul id="todoList"></ul>
+  </div>
+
+  <div class="section">
+    <h3>😴 Log Sleep Hours</h3>
+    <input type="number" id="sleepInput" placeholder="Hours slept today">
+    <button onclick="saveSleep()">Save Sleep</button>
+    <button onclick="setSleepReminder()">⏰ Set Sleep Reminder</button>
+    <p id="sleepData"></p>
+  </div>
+
+  <div class="section">
+    <h3>📊 Activity Summary (Pie Chart)</h3>
+    <canvas id="activityChart"></canvas>
+  </div>
+
+  <div class="section">
+    <h3>📃 Daily Summary</h3>
+    <button onclick="generateSummary()">Generate Summary</button>
+    <p id="summaryOutput"></p>
+  </div>
+
+</div>
+
+<script>
+  const currentUser = localStorage.getItem("trakz_current_user");
+  if (!currentUser) {
+    alert("Please login first.");
+    window.location.href = "login.html";
+  }
+
+  document.getElementById("greeting").textContent = `Hello, ${currentUser}!`;
+
+  // Ask notification permission
+  if ("Notification" in window && Notification.permission !== "granted") {
+    Notification.requestPermission();
+  }
+
+  function showNotification(title, message) {
+    if (Notification.permission === "granted") {
+      new Notification(title, {
+        body: message,
+        icon: "https://cdn-icons-png.flaticon.com/512/1827/1827343.png"
+      });
+    }
+  }
+
+  function updateClockAndGreeting() {
+    const now = new Date();
+    const hrs = now.getHours();
+    const mins = now.getMinutes();
+    const secs = now.getSeconds();
+    const timeString = `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    document.getElementById("clock").textContent = `Current Time: ${timeString}`;
+
+    let greet = "Hello";
+    if (hrs < 12) greet = "Good Morning";
+    else if (hrs < 17) greet = "Good Afternoon";
+    else if (hrs < 20) greet = "Good Evening";
+    else greet = "Good Night";
+
+    document.getElementById("greeting").textContent = `${greet}, ${currentUser.charAt(0).toUpperCase() + currentUser.slice(1)}!`;
+  }
+  setInterval(updateClockAndGreeting, 1000);
+  updateClockAndGreeting();
+
+  let tasks = JSON.parse(localStorage.getItem(`${currentUser}_tasks`)) || [];
+  let todos = JSON.parse(localStorage.getItem(`${currentUser}_todos`)) || [];
+  let sleepHours = localStorage.getItem(`${currentUser}_sleep`) || "";
+
+  function renderTasks() {
+    const list = document.getElementById("taskList");
+    list.innerHTML = "";
+    tasks.forEach((task, index) => {
+      const li = document.createElement("li");
+      li.textContent = `${task.name} (${task.start} - ${task.end})`;
+      list.appendChild(li);
+    });
+    updateChart();
+  }
+
+  function addTask() {
+    const name = document.getElementById("taskName").value;
+    const start = document.getElementById("startTime").value;
+    const end = document.getElementById("endTime").value;
+    if (name && start && end) {
+      tasks.push({ name, start, end });
+      localStorage.setItem(`${currentUser}_tasks`, JSON.stringify(tasks));
+      document.getElementById("taskName").value = "";
+      document.getElementById("startTime").value = "";
+      document.getElementById("endTime").value = "";
+      renderTasks();
+
+      if (confirm("Set reminder for this task?")) {
+        const time = prompt("Enter time (HH:MM 24hr format):");
+        if (time) {
+          const [hr, min] = time.split(":").map(Number);
+          const now = new Date();
+          const target = new Date();
+          target.setHours(hr);
+          target.setMinutes(min);
+          target.setSeconds(0);
+          const delay = target - now;
+          if (delay > 0) {
+            setTimeout(() => {
+              showNotification("📌 Task Reminder", `Reminder for task: ${name}`);
+            }, delay);
+          }
+        }
+      }
+    }
+  }
+
+  function saveSleep() {
+    const hours = document.getElementById("sleepInput").value;
+    if (hours) {
+      localStorage.setItem(`${currentUser}_sleep`, hours);
+      document.getElementById("sleepData").textContent = `Sleep Logged: ${hours} hours`;
+      updateChart();
+    }
+  }
+
+  function setSleepReminder() {
+    const reminderTime = prompt("Enter reminder time (24hr format, e.g., 22:00):");
+    if (!reminderTime) return;
+    const [hr, min] = reminderTime.split(":").map(Number);
+    const now = new Date();
+    const reminder = new Date();
+    reminder.setHours(hr, min, 0);
+    let delay = reminder - now;
+    if (delay < 0) {
+      alert("Time already passed. Choose future time.");
+      return;
+    }
+    alert(`Sleep reminder set for ${reminderTime}`);
+    setTimeout(() => {
+      showNotification("🛏️ Sleep Reminder", "Time to sleep and log your hours!");
+    }, delay);
+  }
+
+  function renderTodos() {
+    const list = document.getElementById("todoList");
+    list.innerHTML = "";
+    todos.forEach((todo, index) => {
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <input type="checkbox" ${todo.done ? "checked" : ""} onchange="toggleTodo(${index})">
+        <span style="text-decoration:${todo.done ? 'line-through' : 'none'}">${todo.text}</span>
+        <button onclick="deleteTodo(${index})" style="margin-left:10px;background:red;">❌</button>
+      `;
+      list.appendChild(li);
+    });
+  }
+
+  function addTodo() {
+    const input = document.getElementById("todoInput");
+    const text = input.value.trim();
+    if (text) {
+      todos.push({ text, done: false });
+      localStorage.setItem(`${currentUser}_todos`, JSON.stringify(todos));
+      input.value = "";
+      renderTodos();
+
+      if (confirm("Set reminder for this to-do item?")) {
+        const time = prompt("Enter time (HH:MM 24hr format):");
+        if (time) {
+          const [hr, min] = time.split(":").map(Number);
+          const now = new Date();
+          const target = new Date();
+          target.setHours(hr);
+          target.setMinutes(min);
+          target.setSeconds(0);
+          const delay = target - now;
+          if (delay > 0) {
+            setTimeout(() => {
+              showNotification("📝 To-Do Reminder", `Reminder for: ${text}`);
+            }, delay);
+          }
+        }
+      }
+    }
+  }
+
+  function toggleTodo(index) {
+    todos[index].done = !todos[index].done;
+    localStorage.setItem(`${currentUser}_todos`, JSON.stringify(todos));
+    renderTodos();
+  }
+
+  function deleteTodo(index) {
+    todos.splice(index, 1);
+    localStorage.setItem(`${currentUser}_todos`, JSON.stringify(todos));
+    renderTodos();
+  }
+
+  function updateChart() {
+    const ctx = document.getElementById("activityChart").getContext("2d");
+    const sleep = parseInt(localStorage.getItem(`${currentUser}_sleep`) || 0);
+    const taskTime = tasks.reduce((acc, t) => {
+      const [sh, sm] = t.start.split(":").map(Number);
+      const [eh, em] = t.end.split(":").map(Number);
+      const startMins = sh * 60 + sm;
+      const endMins = eh * 60 + em;
+      return acc + Math.max(0, (endMins - startMins) / 60);
+    }, 0);
+    const other = Math.max(0, 24 - sleep - taskTime);
+    const chartData = {
+      labels: ['Sleep', 'Tasks', 'Other'],
+      datasets: [{
+        data: [sleep, taskTime, other],
+        backgroundColor: ['#2196F3', '#FF9800', '#9E9E9E']
+      }]
+    };
+    if (window.activityChart) window.activityChart.destroy();
+    window.activityChart = new Chart(ctx, {
+      type: 'pie',
+      data: chartData
+    });
+  }
+
+  function generateSummary() {
+    let totalTime = 0;
+    tasks.forEach(t => {
+      const [sh, sm] = t.start.split(":").map(Number);
+      const [eh, em] = t.end.split(":").map(Number);
+      totalTime += ((eh * 60 + em) - (sh * 60 + sm)) / 60;
+    });
+    const sleep = localStorage.getItem(`${currentUser}_sleep`) || 0;
+    const msg = `You worked for ${totalTime.toFixed(2)} hrs and slept for ${sleep} hrs today.`;
+    document.getElementById("summaryOutput").textContent = msg;
+  }
+
+  function loadQuote() {
+    const quotes = [
+      "Push yourself, because no one else is going to do it for you.",
+      "Success doesn’t come to you. You go to it.",
+      "Dream it. Wish it. Do it.",
+      "Great things never come from comfort zones.",
+      "Don’t stop when you’re tired. Stop when you’re done."
+    ];
+    const index = new Date().getDate() % quotes.length;
+    document.getElementById("quoteBox").textContent = quotes[index];
+  }
+
+  function logout() {
+    localStorage.removeItem("trakz_current_user");
+    window.location.href = "login.html";
+  }
+
+  // On page load
+  renderTasks();
+  renderTodos();
+  loadQuote();
+  if (sleepHours) {
+    document.getElementById("sleepData").textContent = `Sleep Logged: ${sleepHours} hours`;
+  }
+  updateChart();
+</script>
+
+</body>
+</html>

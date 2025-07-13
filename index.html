@@ -1,92 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Trakz</title>
-<h1>📊 Trakz – Your Ultimate Daily Tracker</h1>
-
-
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trakz – Smart Routine Tracker</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    header {
+      background-color: #3f51b5;
+      color: white;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+    .hero h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+    .hero p {
+      margin: 0.5rem 0 2rem;
+    }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .buttons a {
+      text-decoration: none;
+      background-color: white;
+      color: #3f51b5;
+      padding: 0.7rem 1.5rem;
+      border-radius: 5px;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    section.features {
+      padding: 2rem;
+      text-align: center;
+    }
+    .features h2 {
+      margin-bottom: 1rem;
+    }
+    .features-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.5rem;
+    }
+    .feature-box {
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      width: 250px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: #ececec;
+      margin-top: 2rem;
+    }
+    footer a {
+      margin: 0 10px;
+      text-decoration: none;
+      color: #3f51b5;
+    }
+  </style>
 </head>
 <body>
-  <header class="main-header">
-    <h1>⏳ My Daily Life Tracker</h1>
-    <p>Track every moment from wake up to sleep — and conquer procrastination.</p>
-  </header>
 
-  <main>
-    <!-- Slide-In Task Logger -->
-    <section class="task-entry-panel">
-      <h2>📝 Log Your Work</h2>
-      <form id="taskForm">
-        <div class="form-row">
-          <label for="startTime">Start Time</label>
-          <input type="time" id="startTime" required />
-        </div>
-        <div class="form-row">
-          <label for="endTime">End Time</label>
-          <input type="time" id="endTime" required />
-        </div>
-        <div class="form-row">
-          <label for="taskText">What did you do?</label>
-          <textarea id="taskText" placeholder="e.g., Studied OS, Scrolled Instagram, Slept..." rows="2" required></textarea>
-        </div>
-        <button type="submit" class="btn-add">➕ Add Entry</button>
-      </form>
-    </section>
+<header class="hero">
+  <h1>Trakz – Smart Daily Routine Tracker</h1>
+  <p>Track. Analyze. Improve. Make every minute matter.</p>
+  <div class="buttons">
+    <a href="login.html">Login</a>
+    <a href="tracker.html">Get Started</a>
+    <a href="about.html">Learn More</a>
+  </div>
+</header>
 
-    <!-- Task Log Display -->
-    <section class="task-log">
-      <h2>📋 Daily Activity Log</h2>
-      <ul id="taskLog" class="log-list"></ul>
-    </section>
+<section class="features">
+  <h2>Why Use Trakz?</h2>
+  <div class="features-grid">
+    <div class="feature-box">
+      <h3>📝 Task Logging</h3>
+      <p>Log your daily activities by category and time.</p>
+    </div>
+    <div class="feature-box">
+      <h3>💤 Sleep Tracking</h3>
+      <p>Monitor your sleep time and improve rest quality.</p>
+    </div>
+    <div class="feature-box">
+      <h3>📊 Time Analysis</h3>
+      <p>Understand how you spend your time and get insights.</p>
+    </div>
+    <div class="feature-box">
+      <h3>📅 Daily Summary</h3>
+      <p>Get a detailed view of your productivity each day.</p>
+    </div>
+  </div>
+</section>
 
-    <!-- Sleep Tracker -->
-    <section class="sleep-tracker">
-      <h2>😴 Sleep Tracker</h2>
-      <div class="form-row">
-        <label for="sleepTime">Sleep Time</label>
-        <input type="time" id="sleepTime" />
-      </div>
-      <div class="form-row">
-        <label for="wakeTime">Wake Time</label>
-        <input type="time" id="wakeTime" />
-      </div>
-      <button id="calcSleep" class="btn-sleep">🛌 Log Sleep</button>
-      <p class="result-text">You slept <span id="sleepHours">0</span> hours today.</p>
-    </section>
+<footer>
+  <a href="https://github.com/yourusername" target="_blank">GitHub</a>
+  <a href="contact.html">Contact</a>
+  <a href="privacy.html">Privacy Policy</a>
+</footer>
 
-    <!-- Summary Box -->
-    <section class="summary-section">
-        
-
-      <h2>📊 Daily Summary</h2>
-      <div class="summary-grid">
-        <div class="summary-box work">
-          <h3>Work Time</h3>
-          <p><span id="workHours">0</span> hrs</p>
-        </div>
-        <div class="summary-box sleep">
-          <h3>Sleep Time</h3>
-          <p><span id="sleepSummary">0</span> hrs</p>
-        </div>
-        <div class="summary-box waste">
-          <h3>Procrastinated</h3>
-          <p><span id="wasteHours">0</span> hrs</p>
-        </div>
-      </div>
-      <div id="quoteArea" class="quote-box">💬 Your quote will appear here!</div>
-
-      <button id="generateSummary" class="btn-summary">📈 Generate Summary</button>
-    </section>
-  </main>
-
-  <footer>
-    <p>💡 Designed to reflect your day — Make every hour count!</p>
-  </footer>
-
-  <script src="script.js"></script>
 </body>
 </html>
